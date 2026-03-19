@@ -30,6 +30,5 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add stock_analysis.json stock_analysis.xlsx
           git commit -m "Update stock data: $(date +'%Y-%m-%d')" || echo "No changes to commit"
           git push
