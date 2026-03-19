@@ -36,7 +36,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          # 생성된 모든 결과물(json, xlsx)을 강제로 추가
-          git add stock_analysis.json stock_analysis.xlsx || echo "No files to add"
+          # 생성된 모든 결과물(json)을 강제로 추가
+          git add stock_analysis.json || echo "No files to add"
           # 변경사항이 있을 때만 커밋 및 푸시
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update stock data: $(date +'%Y-%m-%d')" && git push)
