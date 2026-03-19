@@ -49,9 +49,72 @@
     border: 1px solid #1e293b;
     color: #94a3b8;
   }
+
+  .button-guide span {
+  margin-left: 15px;
+}
+
+.button-guide span:first-child {
+  margin-left: 0;
+}
+
   
   .button-guide span { margin-left: 15px; }
   .button-guide b { color: #e5e7eb; }
+
+  .button-guide {
+  text-align: right;
+}
+
+.strategy-box button.active {
+  background: #3b82f6;
+}
+
+.strategy-container {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 15px;
+}
+
+.strategy-title {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+.strategy-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.strategy-box button {
+  padding: 8px 14px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #e5e7eb;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.strategy-box button:hover {
+  background: #334155;
+}
+
+/* 선택된 버튼 */
+.strategy-box button.active {
+  background: #3b82f6;
+}
+
+/* 설명 영역 */
+.strategy-desc {
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.5;
+}
 
   table {
     width: 100%;
@@ -69,6 +132,19 @@
     background: #0f172a;
     position: relative;
   }
+
+th:first-child {
+  background: #0f172a;  /* 헤더 색상 통일 */
+}
+
+td:first-child {
+  background: #020617;  /* 바디는 기존 유지 */
+}
+
+
+th:first-child {
+  z-index: 3;
+}
 
   tr:hover { background: #1e293b; }
 
@@ -119,28 +195,58 @@
   .blue { color: #38bdf8; font-weight: bold; }
   .yellow { color: #facc15; font-weight: bold; } /* 이격도 절댓값 강조용 */
   .white { color: #ffffff; }
+
+  .desc {
+  font-size: 11px;
+  font-weight: normal;
+}
 </style>
 </head>
 
 <body>
 
-<h2>📊 주식 분석 대시보드</h2>
+<h2>📊 주식/ETF 종목 선정 대시보드</h2>
+
+<div class="strategy-container">
+
+  <!-- 제목 -->
+  <div class="strategy-title">📌 추천 필터</div>
+
+  <!-- 버튼 영역 -->
+  <div class="strategy-box">
+    <button onclick="applyStrategy('trend_pullback')">
+      📉 상승추세-단기저점
+    </button>
+  </div>
+
+  <!-- 설명 영역 -->
+  <div id="strategy-desc" class="strategy-desc">
+    버튼을 선택하면 조건이 표시됩니다.
+  </div>
+
+</div>
 
 <div class="top-container">
   <div class="control-panel">
-    <input type="text" id="tickerSearch" placeholder="Ticker 검색 (예: AAPL)" oninput="renderTable()">
-  </div>
+  <input type="text" id="tickerSearch" placeholder="Ticker 검색 (예: AAPL)" oninput="renderTable()">
+  <button onclick="clearAllFilters()" style="
+    margin-left:8px;
+    padding:8px 12px;
+    background:#540202;
+    border:none;
+    border-radius:4px;
+    color:white;
+    cursor:pointer;
+  ">필터 초기화</button>  </div>
   
   <div class="guide-wrapper">
-    <div class="update-info"> 매주 토요일 오전 8시 업데이트</div>
-    
-    <div class="button-guide">
-      <span><b>Golden(상승추세)</b></span>
-      <span><b>Dead(하락추세)</b></span>
-      <span><b>RSI 70 이상(과매수-탐욕)</b></span>
-      <span><b>RSI 30 이하(과매도-공포)</b></span>
+    <div class="update-info"> ※ 매주 토요일 오전 8시 업데이트
       <span>↕️ <b>정렬</b></span>
       <span>🔍 <b>조건 설정</b></span>
+    </div>
+    
+    <div class="button-guide">
+      <span><b><span class="desc">주1) 이동평균선 이격도(%) 절대값 5이하로 낮을수록 주가 변동성 확대 가능성 큼</span></b></span></br>
     </div>
   </div>
 </div>
@@ -149,10 +255,16 @@
   <thead>
     <tr>
       <th rowspan="2">Ticker <span class="btn-icon" onclick="handleSort('Ticker')">↕️</span></th>
-      <th colspan="5" class="border-left">수익률 (%)</th>
-      <th colspan="3" class="border-left">크로스</th>
-      <th colspan="4" class="border-left">이동평균선과의 이격도 (%)</th>
-      <th colspan="3" class="border-left">RSI(매매강도)</th>
+      <th colspan="3" class="border-left">수익률 (%)</th>
+      <th colspan="3" class="border-left">크로스:
+        <span class="desc yellow">Golden(상승추세)</span>
+      </th>
+      <th colspan="3" class="border-left">RSI:
+        <span class="desc blue">30↓ 공포</span> 
+        <span class="desc"> / </span>
+        <span class="desc red">70↑ 탐욕</span> 
+      </th>
+      <th colspan="6" class="border-left">이동평균선 이격도(%)</th>
     </tr>
     <tr id="sub-headers"></tr>
   </thead>
@@ -165,21 +277,22 @@ let filterState = {};
 let sortState = { key: null, asc: true };
 
 const columns = [
-  { label: '1D', key: 'Return_1D', type: 'number', divider: true },
-  { label: '1W', key: 'Return_1W', type: 'number' },
-  { label: '1M', key: 'Return_1M', type: 'number' },
-  { label: '6M', key: 'Return_6M', type: 'number' },
-  { label: '1Y', key: 'Return_1Y', type: 'number' },
-  { label: 'Day', key: 'Cross_D', type: 'string', divider: true },
-  { label: 'Week', key: 'Cross_W', type: 'string' },
-  { label: 'Month', key: 'Cross_M', type: 'string' },
-  { label: '50 Day', key: 'Dist50_D', type: 'number', divider: true },
-  { label: '200 Day', key: 'Dist200_D', type: 'number' },
-  { label: '50 Week', key: 'Dist50_W', type: 'number' },
-  { label: '200 Week', key: 'Dist200_W', type: 'number' },
-  { label: 'Day', key: 'RSI_D', type: 'number', divider: true },
-  { label: 'Week', key: 'RSI_W', type: 'number' },
-  { label: 'Month', key: 'RSI_M', type: 'number' }
+  { label: '1주', key: 'Return_1W', type: 'number', divider: true },
+  { label: '1개월', key: 'Return_1M', type: 'number' },
+  { label: '1년', key: 'Return_1Y', type: 'number' },
+  { label: '일봉', key: 'Cross_D', type: 'string', divider: true },
+  { label: '주봉', key: 'Cross_W', type: 'string' },
+  { label: '월봉', key: 'Cross_M', type: 'string' },
+  { label: '일봉', key: 'RSI_D', type: 'number', divider: true },
+  { label: '주봉', key: 'RSI_W', type: 'number' },
+  { label: '월봉', key: 'RSI_M', type: 'number' },
+  { label: '50일', key: 'Dist50_D', type: 'number', divider: true },
+  { label: '200일', key: 'Dist200_D', type: 'number' },
+  { label: '50주', key: 'Dist50_W', type: 'number' },
+  { label: '200주', key: 'Dist200_W', type: 'number' },
+  { label: '50월', key: 'Dist50_M', type: 'number' }, 
+  { label: '200월', key: 'Dist200_M', type: 'number' } 
+
 ];
 
 async function loadData() {
@@ -225,6 +338,41 @@ function buildHeaders() {
   tr.innerHTML = html;
 }
 
+function applyStrategy(type){
+  filterState = {};
+
+  let descText = "";
+
+  if(type === 'trend_pullback'){
+    // 필터 조건
+    filterState['Cross_D'] = { type:'string', val:'Golden' };
+    filterState['Cross_W'] = { type:'string', val:'Golden' };
+    filterState['Cross_M'] = { type:'string', val:'Golden' };
+    filterState['RSI_D'] = { type:'number', min:-Infinity, max:30 };
+
+    sortState = { key: 'RSI_D', asc: true };
+
+    // 설명
+    descText = `
+      <b>상승추세-단기저점 전략</b><br>
+      - 일봉(day) / 주봉(week) / 월봉(month) 모든 타임프레임에서 상승 추세(Golden)<br>
+      - 일봉(day) RSI 30 이하 (단기적인 과매도-공포 구간)<br>
+      👉 상승 추세 중 단기적인 눌림목 매수 전략
+    `;
+  }
+
+  // 버튼 active 처리
+  document.querySelectorAll('.strategy-box button')
+    .forEach(btn => btn.classList.remove('active'));
+
+  event.target.classList.add('active');
+
+  // 설명 업데이트
+  document.getElementById('strategy-desc').innerHTML = descText;
+
+  renderTable();
+}
+
 function togglePopup(key, event) {
   event.stopPropagation();
   const currentPopup = document.getElementById(`popup-${key}`);
@@ -232,6 +380,33 @@ function togglePopup(key, event) {
   document.querySelectorAll('.filter-popup').forEach(p => p.style.display = 'none');
   if (!isVisible) currentPopup.style.display = 'block';
 }
+
+function clearAllFilters(){
+  filterState = {};
+  sortState = { key: null, asc: true };
+
+  document.querySelectorAll('input, select').forEach(el => {
+    if(el.id.startsWith('min-') || el.id.startsWith('max-') || el.id.startsWith('val-')){
+      el.value = '';
+    }
+  });
+
+  // ✅ 필터 아이콘 초기화
+  document.querySelectorAll('.filter-active').forEach(el=>{
+    el.classList.remove('filter-active');
+  });
+
+  document.querySelectorAll('.strategy-box button')
+    .forEach(btn => btn.classList.remove('active'));
+
+  // ✅ 설명도 초기화 (추천)
+  document.getElementById('strategy-desc').innerHTML = "버튼을 선택하면 조건이 표시됩니다.";
+
+  document.getElementById('tickerSearch').value = '';
+
+  renderTable();
+}
+
 
 document.addEventListener('click', () => {
   document.querySelectorAll('.filter-popup').forEach(p => p.style.display = 'none');
@@ -290,26 +465,28 @@ function renderTable() {
 
   const rsiColor = v => v >= 70 ? "red" : (v <= 30 ? "blue" : "white");
   const distColor = v => (v !== null && Math.abs(v) <= 5) ? "yellow" : "white";
+  const crossColor = v => v === "Golden" ? "yellow" : "";
 
   result.forEach(item => {
     const row = `
       <tr>
         <td>${item.Ticker}</td>
-        <td class="border-left">${item.Return_1D ?? ""}</td>
-        <td>${item.Return_1W ?? ""}</td>
+        <td class="border-left">${item.Return_1W ?? ""}</td>
         <td>${item.Return_1M ?? ""}</td>
-        <td>${item.Return_6M ?? ""}</td>
         <td>${item.Return_1Y ?? ""}</td>
-        <td class="border-left">${item.Cross_D ?? ""}</td>
-        <td>${item.Cross_W ?? ""}</td>
-        <td>${item.Cross_M ?? ""}</td>
+        
+        <td class="border-left ${crossColor(item.Cross_D)}">${item.Cross_D ?? ""}</td>
+        <td class="${crossColor(item.Cross_W)}">${item.Cross_W ?? ""}</td>
+        <td class="${crossColor(item.Cross_M)}">${item.Cross_M ?? ""}</td>
+        <td class="border-left ${rsiColor(item.RSI_D)}">${item.RSI_D ?? ""}</td>
+        <td class="${rsiColor(item.RSI_W)}">${item.RSI_W ?? ""}</td>
+        <td class="${rsiColor(item.RSI_M)}">${item.RSI_M ?? ""}</td>
         <td class="border-left ${distColor(item.Dist50_D)}">${item.Dist50_D ?? ""}</td>
         <td class="${distColor(item.Dist200_D)}">${item.Dist200_D ?? ""}</td>
         <td class="${distColor(item.Dist50_W)}">${item.Dist50_W ?? ""}</td>
         <td class="${distColor(item.Dist200_W)}">${item.Dist200_W ?? ""}</td>
-        <td class="border-left ${rsiColor(item.RSI_D)}">${item.RSI_D ?? ""}</td>
-        <td class="${rsiColor(item.RSI_W)}">${item.RSI_W ?? ""}</td>
-        <td class="${rsiColor(item.RSI_M)}">${item.RSI_M ?? ""}</td>
+        <td class="${distColor(item.Dist50_M)}">${item.Dist50_M ?? ""}</td>
+        <td class="${distColor(item.Dist200_M)}">${item.Dist200_M ?? ""}</td> 
       </tr>
     `;
     tbody.innerHTML += row;
