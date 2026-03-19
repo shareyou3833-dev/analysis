@@ -2,8 +2,9 @@ name: Stock Data Update
 
 on:
   schedule:
-    - cron: '0 0 * * 6' # 토요일 09:00 KST
-  workflow_dispatch:
+    # 한국 시간(KST) 매주 토요일 오전 9시
+    - cron: '0 0 * * 6'
+  workflow_dispatch: # 수동 실행 버튼
 
 permissions:
   contents: write
@@ -23,19 +24,20 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # 라이브러리들을 개별적으로 설치하여 충돌을 방지합니다.
-          pip install yfinance pandas==2.2.2 openpyxl 
-          # pandas-ta는 PyPI 정식 버전 대신 개발자용 최신 버전을 직접 설치하는 것이 가장 확실합니다.
+          # 버전 충돌을 피하기 위해 pandas 버전을 고정하고 필요한 라이브러리만 설치합니다.
+          pip install yfinance pandas==2.2.2 openpyxl
+          # pandas-ta는 PyPI 버전 대신 GitHub 최신 소스로 직접 설치하여 오류를 방지합니다.
           pip install git+https://github.com/twopirllc/pandas-ta.git
 
       - name: Run analysis
+        # 실행 파일명을 실제 파일명과 일치시켰습니다.
         run: python tck_analysis_github.py
 
       - name: Commit and Push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          # 생성된 모든 결과물을 추가합니다.
-          git add stock_analysis.json stock_analysis.xlsx || echo "No files to add"
-          # 변경사항이 있을 때만 커밋
+          # 생성된 모든 결과물 추가
+          git add stock_analysis.json || echo "No files to add"
+          # 변경사항이 있을 때만 커밋 및 푸시
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update stock data: $(date +'%Y-%m-%d')" && git push)
