@@ -199,11 +199,6 @@ th:first-child {
     opacity: 0.7;
   }
 
-.signal-bg {
-  /* 기존 인라인 스타일(히트맵)보다 우선 적용되도록 !important 추가 */
-  background-color: rgba(239, 68, 68, 0.5); 
-  font-weight: bold;
-}
 
   .filter-popup {
     display: none;
@@ -353,7 +348,7 @@ th:first-child {
   <!-- 버튼 영역 -->
   <div class="strategy-box">
     <button onclick="applyStrategy('trend_pullback', event)">
-      📉 상승추세+단기조정
+      ⬆️ 상승추세+단기조정
     </button>
     <button onclick="applyStrategy('volume_rsi', event)">
       💰 중장기 자금유입+단기조정
@@ -691,7 +686,6 @@ function renderTable() {
   const distColor = v => (v !== null && Math.abs(v) <= 5) ? "yellow" : "white";
   const crossColor = v => v === "Golden" ? "yellow" : "";
   const volumeColor = v => v >= 50 ? "red" : "";
-  const signalCheck = (ret, vol) => (ret > 0 && vol > 0) ? "signal-bg" : "";
 
   const baseData = allData.filter(item => etfMeta[item.Ticker]);
 
@@ -708,8 +702,8 @@ function renderTable() {
 
   result.forEach(item => {
 
-    const signalW = signalCheck(item.Return_1W, item.Volume_W);
-    const signalM = signalCheck(item.Return_1M, item.Volume_M);
+
+
 
     const row = `
     <tr>
@@ -719,23 +713,23 @@ function renderTable() {
         (${etfMeta[item.Ticker] ?? '-'})
       </span>
     </td>
-      <td class="border-left ${signalW}" 
+      <td class="border-left" 
 
           style="${getOpacityColor(item.Return_1W, return1W.min, return1W.max)}">
         ${item.Return_1W ?? ""}
       </td>
 
-      <td class="${signalW}"
+      <td
           style="${getOpacityColor(item.Volume_W, volumeW.min, volumeW.max)}">
         ${item.Volume_W ?? ""}
       </td>
 
-      <td class="border-left ${signalM}" 
+      <td class="border-left" 
           style="${getOpacityColor(item.Return_1M, return1M.min, return1M.max)}">
         ${item.Return_1M ?? ""}
       </td>
 
-      <td class="${signalM}"
+      <td 
           style="${getOpacityColor(item.Volume_M, volumeM.min, volumeM.max)}">
         ${item.Volume_M ?? ""}
       </td>
