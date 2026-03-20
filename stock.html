@@ -307,7 +307,7 @@ th:first-child {
         <span class="desc"> / </span>
         <span class="desc red">70↑ 탐욕</span> 
       </th>
-      <th colspan="6" class="border-left">이동평균선 이격도(%)</th>
+      <th colspan="4" class="border-left">이동평균선 이격도(%)</th>
     </tr>
     <tr id="sub-headers"></tr>
   </thead>
@@ -334,10 +334,7 @@ const columns = [
   { label: '50일', key: 'Dist50_D', type: 'number', divider: true },
   { label: '200일', key: 'Dist200_D', type: 'number' },
   { label: '50주', key: 'Dist50_W', type: 'number' },
-  { label: '200주', key: 'Dist200_W', type: 'number' },
-  { label: '50개월', key: 'Dist50_M', type: 'number' }, 
-  { label: '200개월', key: 'Dist200_M', type: 'number' } 
-
+  { label: '200주', key: 'Dist200_W', type: 'number' }
 ];
 
 async function loadData() {
@@ -568,8 +565,6 @@ function renderTable() {
       <td class="${distColor(item.Dist200_D)}">${item.Dist200_D ?? ""}</td>
       <td class="${distColor(item.Dist50_W)}">${item.Dist50_W ?? ""}</td>
       <td class="${distColor(item.Dist200_W)}">${item.Dist200_W ?? ""}</td>
-      <td class="${distColor(item.Dist50_M)}">${item.Dist50_M ?? ""}</td>
-      <td class="${distColor(item.Dist200_M)}">${item.Dist200_M ?? ""}</td> 
     </tr>
     `;
     tbody.innerHTML += row;
