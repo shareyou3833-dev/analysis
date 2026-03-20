@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<meta name="description" content="주식 및 ETF 기술적 지표 모니터링 시스템. RSI, 이동평균선을 분석합니다.">
+<meta name="keywords" content="주식, ETF 모니터링, 기술적지표, 이동평균선, RSI, 투자">
+
+<meta charset="UTF-8">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7049952308538137"
+     crossorigin="anonymous"></script>
+<title>투자 모니터링 시스템</title>
+
+<style>
+  body {
+    margin:0;
+    background: radial-gradient(circle at top, #0f172a, #020617);
+    color:white;
+    font-family: 'Segoe UI', sans-serif;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+.container {
+  text-align: center;
+  width: 100%;
+  max-width: 1000px;
+  /* 카드가 있는 메인 영역이 공간을 다 차지하게 해서 푸터를 아래로 밀어냅니다 */
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+  h1 {
+    font-size:40px;
+    margin-bottom:10px;
+  }
+
+  .subtitle {
+    color:#94a3b8;
+    margin-bottom:50px;
+  }
+
+  .card-group {
+    display:flex;
+    gap:30px;
+  }
+
+  .card {
+    flex:1;
+    background: rgba(15,23,42,0.8);
+    border:1px solid #1e293b;
+    border-radius:16px;
+    padding:20px;
+    text-align:left;
+    transition: all 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+  }
+
+  .card img {
+    width:100%;
+    border-radius:12px;
+    margin-bottom:15px;
+  }
+
+  .card-title {
+    font-size:20px;
+    margin-bottom:8px;
+  }
+
+  .card-desc {
+    font-size:14px;
+    color:#94a3b8;
+    margin-bottom:20px;
+  }
+
+  .card {
+  cursor:pointer;
+  }
+
+  .card:hover {
+  transform: translateY(-8px) scale(1.02);
+  }
+
+  .btn {
+    width:100%;
+    padding:14px;
+    border-radius:10px;
+    cursor:pointer;
+    border:1px solid #bfa14a;
+    color:white;
+    background: linear-gradient(135deg, #0f172a, #020617);
+    transition: all 0.3s ease;
+  }
+
+  .btn:hover {
+    background: linear-gradient(135deg, #1e3a8a, #020617);
+  }
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>투자 모니터링 시스템</h1>
+  <div class="subtitle">시장 수급과 트렌드를 한눈에 분석합니다</div>
+
+  <div class="card-group">
+
+    <!-- ETF 카드 -->
+    <div class="card" onclick="location.href='etf.html'">
+      <img src="etf.jpg">
+
+      <div class="card-title">🌐 섹터별 ETF 모니터링</div>
+      <div class="card-desc">
+        섹터별 ETF의 기술적 지표를 모니터링하여 시장의 흐름을 파악합니다.
+      </div>
+    </div>
+
+    <!-- 주식 카드 -->
+    <div class="card" onclick="location.href='stock.html'">
+      <img src="stock.jpg">
+
+      <div class="card-title">📊 개별 종목 모니터링</div>
+      <div class="card-desc">
+        S&P500 등에 상장된 우량주의 거래량, 추세, 기술적 지표를 기반으로 매매 기회를 포착합니다.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<body>
+
+
+
+<div style="padding: 20px; color: #1e293b; font-size: 10px; text-align: center; width: 100%; border-top: 1px solid #1e293b;">
+    <p style="margin-bottom: 5px;">본 시스템은 RSI, 이동평균선, 이격도 알고리즘 기반 투자 보조 도구입니다.</p>
+    <p>
+        © 2026 Stock Monitoring. 
+        <span style="cursor: pointer; text-decoration: underline;" onclick="alert('Contact: shareyou3833@gmail.com')">Contact</span> | 
+        <span style="cursor: pointer; text-decoration: underline;" onclick="document.getElementById('privacy-modal').style.display='block'">Privacy Policy</span>
+    </p>
+</div>
+
+<div id="privacy-modal">...</div>
+
+</body>
+
+</body>
+</html>
