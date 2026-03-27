@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<meta name="description" content="주식 및 ETF 기술적 지표 모니터링 시스템. RSI, 이동평균선을 분석합니다.">
+<meta name="keywords" content="주식, ETF 모니터링, 기술적지표, 이동평균선, RSI, 투자">
+
+<meta charset="UTF-8">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7049952308538137"
+     crossorigin="anonymous"></script>
+
+<title>투자 모니터링 시스템</title>
+
+<style>
+  body {
+    margin: 0;
+    background: radial-gradient(circle at top, #0f172a, #020617);
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    /* [수정] 고정 높이 제거, 최소 높이만 설정하여 내용에 따라 늘어나게 함 */
+    min-height: 100vh; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .container {
+    text-align: center;
+    width: 100%;
+    max-width: 1000px;
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+    /* [수정] justify-content: center 제거 (위에서부터 차례대로 쌓이도록 함) */
+    align-items: center;
+    padding: 60px 20px;
+  }
+
+  h1 {
+    font-size: 42px;
+    margin-bottom: 10px;
+  }
+
+  .subtitle {
+    color: #94a3b8;
+    margin-bottom: 40px;
+  }
+
+  /* --- [수정] 사라진 박스 복구 및 디자인 최적화 --- */
+  .overview-section {
+    /* 하단 카드 그룹과 동일한 최대 너비 설정 */
+    width: 100%;
+    max-width: 1000px; /* .container의 max-width와 일치시켜 이미지 양 끝에 맞춤 */
+    
+    box-sizing: border-box;
+    margin-bottom: 50px;
+    padding: 35px 40px;
+    
+    /* 박스 외형 정의 */
+    background: rgba(30, 41, 59, 0.3); /* 반투명 배경 */
+    border: 1px solid rgba(191, 161, 74, 0.2); /* 은은한 골드 테두리 */
+    border-radius: 20px;
+    backdrop-filter: blur(8px); /* 글래스모피즘 효과 */
+    
+    text-align: left;
+  }
+
+  .overview-title {
+    color: #f8fafc;
+    font-size: 24px;
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+  }
+
+  /* --- [수정] 상하위 항목 서식 완전 일치화 --- */
+  .overview-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+  }
+
+  .overview-item {
+    display: block; 
+    position: relative;
+    padding-left: 30px; 
+    margin-bottom: 25px; 
+    font-size: 20px; /* 본문 폰트 크기 */
+    line-height: 1.7;
+    color: #eef1f4; /* 본문 색상 */
+    word-break: keep-all;
+  }
+
+/* 제목 옆 골드 포인트 바 */
+  .overview-title::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 24px;
+    background-color: #bfa14a;
+    margin-right: 12px;
+    border-radius: 2px;
+  }
+
+  /* --- [수정] 들여쓰기 구간 서식 일치 --- */
+  .sub-list {
+    list-style: none;
+    padding-left: 10px;
+    margin-top: 20px; /* 지표 설명 시작 전 여백 확보 */
+    margin-bottom: 0;
+    display: block;
+  }
+
+  .sub-list li {
+    display: block;
+    position: relative;
+    padding-left: 25px; /* 기호와 텍스트 간격 */
+    margin-bottom: 15px;
+    /* [중요] 상위 항목과 폰트 크기 및 색상 동일하게 설정 */
+    font-size: 20px; 
+    color: #e7ebf0; 
+    line-height: 1.7;
+  }
+
+  /* 서브 리스트 기호를 조금 더 명확한 대시(-)로 변경 */
+  .sub-list li::before {
+    content: '-';
+    position: absolute;
+    left: 0;
+    color: #bfa14a;
+    font-weight: bold;
+  }
+
+  /* 강조 텍스트 색상 통일 */
+  .overview-item strong, .sub-list li strong {
+    color: #facc15;
+    font-weight: 700;
+    display: inline;
+  }
+
+    .card-group {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+    }
+
+    .card {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      padding: 20px;
+      text-align: left;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    }
+
+    .card img {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
+
+    .card-title {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .card-desc {
+      font-size: 20px;
+      color: #94a3b8;
+      margin-bottom: 20px;
+    }
+
+    .content-section {
+    max-width: 950px;
+    margin: 60px auto 40px;
+    padding: 25px 30px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    line-height: 1.8;
+   }
+
+  .content-section h3 {
+    margin-bottom: 15px;
+    font-size: 22px;
+    color: #94a3b8;
+    }
+
+  .content-section p {
+    font-size: 15px;
+    color: #94a3b8;
+    margin-bottom: 12px;
+   }
+
+    .footer {
+      padding: 20px; 
+      color: #94a3b8; 
+      font-size: 10px; 
+      text-align: center; 
+      width: 100%; 
+      border-top: 1px solid #1e293b;
+    }
+
+        .hero-image {
+      width: 100%;
+      max-width: 1000px; /* 카드/overview랑 동일하게 맞춤 */
+      margin-bottom: 40px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(191, 161, 74, 0.2);
+      background: rgba(15, 23, 42, 0.6);
+    }
+
+    .hero-image img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 20px;
+    }
+
+       .dropdown {
+  position: relative;
+}
+
+.dropbtn {
+  padding: 6px 14px;
+  background: #334155;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #1e293b;
+  min-width: 160px;
+  border-radius: 6px;
+  overflow: hidden;
+  z-index: 999;
+}
+
+.dropdown-content a {
+  display: block;
+  padding: 8px 12px;
+  color: #e5e7eb;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.dropdown-content a:hover {
+  background: #334155;
+}
+
+/* 🔥 핵심: hover 시 열림 */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+  
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div style="display: flex; gap: 8px; margin-bottom: 15px; align-self: flex-start; "> 
+
+    <button onclick="location.href='index.html'" style="
+      padding: 6px 14px;
+      background: #334155;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      ">
+        🏠 홈으로
+    </button>
+
+    <button onclick="location.href='etf.html'" style="
+      padding: 6px 14px;
+      background: #334155;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+    ">
+    🌐 섹터별 ETF 모니터링
+    </button>
+
+    <button onclick="location.href='stock.html'" style="
+      padding: 6px 14px;
+      background: #334155;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+    ">
+    📊 개별 종목 모니터링
+    </button>
+
+                    <!-- 🗺️ 드롭다운 버튼 -->
+    <div class="dropdown">
+      <button class="dropbtn">🗺️ 사용 가이드</button>
+
+      <div class="dropdown-content">
+        <a href="guide_short.html">상승추세+단기조정</a>
+        <a href="guide_low.html">저점매집</a>
+        <a href="guide_energy.html">에너지 응축</a>
+        <!-- 필요하면 계속 추가 -->
+      </div>
+    </div>
+
+            <!-- 🔽 드롭다운 버튼 -->
+    <div class="dropdown">
+      <button class="dropbtn">🔽 지표 설명</button>
+
+      <div class="dropdown-content">
+        <a href="indc_volume.html">거래량이란?</a>
+        <a href="indc_ma.html">이동평균선이란?</a>
+        <a href="indc_ma_cross.html">이동평균선 크로스란?</a>
+        <a href="indc_rsi.html">RSI란?</a>
+        <!-- 필요하면 계속 추가 -->
+      </div>
+    </div>
+
+    </div>
+
+  <h1>이동평균선 이격도에 대하여</h1>
+  <div class="subtitle">이동평균선 이격도의 실증적 의미에 대하여 알아봅니다. </div>
+
+<div class="hero-image">
+  <img src="indc_ma_dist.jpg" alt="투자 분석 이미지">
+</div>
+
+
+<div class="overview-section">
+  <h2 class="overview-title">이동평균선 이격도 <span style="font-size: 14px; color: #94a3b8; margin-left: 10px; font-weight: normal;">Moving Average Distance</span></h2>
+  <ul class="overview-list">
+
+    <li class="overview-item">
+      <strong>1. 이동평균선 이격도란?</strong> 주가가 이동평균선으로부터 얼마나 떨어져 있는지를 백분율로 나타낸 지표입니다. 
+      주가는 이평선에서 멀어지면 다시 돌아오려는 '회귀 본능'이 있는데, 이격도는 바로 이 탄성 에너지를 측정합니다. 
+      이격도가 100%라면 주가와 이평선이 일치하는 상태이며, 이 수치가 너무 높으면 '과열(매도 검토)', 
+      너무 낮으면 '과매도(매수 검토)'로 해석하여 단기적인 변곡점을 잡아내는 데 유용합니다.
+    </li>
+
+    <li class="overview-item">
+      <strong>2. 50일 이격도 의미</strong> 중기적인 투자 심리가 얼마나 들떠 있거나 위축되었는지를 보여줍니다. 
+      보통 5~10% 이상이면 단기적인 차익 실현 욕구가 강해지는 구간으로 보고, -10~-5% 이하라면 투매가 진정되며 반등을 모색하는 구간으로 봅니다. 
+      약 두 달 반 동안의 평균 단가와 비교하는 것이기에, 스윙 투자자들이 현재 가격이 적정 수준을 벗어났는지 판단하는 가장 대중적인 기준이 됩니다.
+
+    <li class="overview-item">
+      <strong>3. 200일 이격도 의미</strong> 장기적인 추세 속에서 발생한 '비정상적인 오버슈팅'이나 '패닉 셀링'을 포착하는 데 탁월합니다. 
+      1년 평균치인 200일선에서 주가가 20~30% 이상 벌어지는 일은 흔치 않기 때문에, 이격도가 극단적으로 치솟거나 낮아질 때는 역사적인 고점이나 저점일 확률이 매우 높습니다. 
+      장기 투자자들에게는 현재의 상승이나 하락이 지속 가능한 수준인지, 아니면 과도한 탐욕과 공포에 의한 것인지를 알려주는 경고등 역할을 합니다.
+    </li>
+    
+    <li class="overview-item">
+      <strong>4. 200주 이격도 의미</strong> 수년간 이어진 거대한 흐름 속에서의 위치를 가늠하게 해줍니다. 
+      약 4년의 평균 가격과 비교하는 것이기에 일시적인 뉴스나 악재에 휘둘리지 않는 묵직한 지표입니다. 
+      만약 200주 이격도가 과거 최저치 수준까지 내려왔다면, 이는 단순히 주가가 싼 것을 넘어 해당 자산이 '역사적 저평가' 구간에 진입했음을 시사합니다. 
+      반대로 이 수치가 비정상적으로 높다면 자산 거품이 한계치에 다다랐다는 신호로 읽을 수 있습니다.
+    </li>
+
+    <li class="overview-item">
+      <strong>5. 400주 이격도 의미</strong> 시장의 절대적인 지지선 혹은 '지옥의 끝'을 확인하는 도구입니다. 
+      8년이라는 초장기 평균과의 괴리율을 따지는 것이기에, 경제 위기급 폭락장에서만 유의미한 수치를 보여줍니다. 
+      400주 이격도가 바닥을 찍는 순간은 대개 세상이 망할 것 같은 공포가 지배할 때이지만, 
+      역설적으로 그 시점은 자산 가격이 평균으로 회귀하기 위해 가장 강력한 반등 에너지를 응축하고 있는 순간이기도 합니다.
+    </li>
+
+
+  </ul>
+</div>
+
+</div>
+
+
+<div class="footer">
+  <p style="margin-bottom: 5px;">
+    본 시스템은 RSI, 이동평균선, 이격도 알고리즘 기반 투자 보조 도구입니다.
+  </p>
+
+  <p>
+    © 2026 Stock Monitoring.
+    <a href="contact.html" style="color:#94a3b8; text-decoration: underline;">Contact</a> |
+    <a href="privacy.html" style="color:#94a3b8; text-decoration: underline;">Privacy Policy</a> |
+    <a href="about.html" style="color:#94a3b8; text-decoration: underline;">About</a>
+  </p>
+</div>
+
+<div id="privacy-modal" style="display:none;">...</div>
+
+</body>
+</html>
